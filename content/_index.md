@@ -22,6 +22,6 @@
 {{< hextra/feature-card
   title="A New Foundation"
   subtitle="My first update: Moving into the new home."
-  link="/posts/new-foundation/"
+  link="posts/new-foundation/"
   icon="star"
 >}}
