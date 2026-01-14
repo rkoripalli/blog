@@ -1,0 +1,22 @@
+# Hugo build output (GitHub Actions will generate this)
+public/
+
+# Generated resources (CSS/Images cache)
+resources/_gen/
+
+# Operating System files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# VS Code settings (Personal preference, usually best to ignore)
+.vscode/
+
+# Temporary files
+*.swp
+*.log
+
+# Node modules (if you use any npm packages later)
+node_modules/
+
+.hugo_build.lock

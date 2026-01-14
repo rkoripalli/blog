@@ -1,0 +1,44 @@
+/* 1. Import Fonts */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Manrope:wght@400;600;800&display=swap');
+
+:root {
+    /* 2. Set Fonts */
+    --font-sans: 'Manrope', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    
+    /* 3. Primary Amber Color */
+    --primary-hue: 35deg;
+    --primary-saturation: 90%;
+    --primary-lightness: 60%;
+}
+
+body { font-family: var(--font-sans); }
+h1, h2, h3, h4 { font-weight: 800; letter-spacing: -0.02em; }
+
+/* 4. THE "FLAT" DARK MODE */
+:root.dark {
+    /* Define ONE color for everything */
+    --flat-bg: #1f2022; 
+
+    /* Apply it to Main Background */
+    --background: var(--flat-bg) !important;
+    
+    /* Apply it to Sidebars and Cards (No lighter boxes) */
+    --bg-secondary: var(--flat-bg) !important;
+    
+    /* Ensure the Navbar blends in perfectly */
+    --navbar-bg: var(--flat-bg) !important;
+}
+
+/* Force the override on specific Hextra elements */
+.dark body, 
+.dark .hx-bg-gray-100, 
+.dark .nav-container {
+    background-color: var(--flat-bg) !important;
+}
+
+/* Optional: Add a subtle border line so you can still tell where the menu ends 
+   (Since the colors are now identical, a thin line helps navigation) */
+.dark .hx-border-gray-200 {
+    border-color: #333 !important;
+}

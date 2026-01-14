@@ -1,0 +1,62 @@
+baseURL = 'https://rkoripalli.github.io/'
+languageCode = 'en-us'
+title = 'Rohan Koripalli'
+theme = 'hextra'
+
+# Required for the "Fancy" homepage blocks to work
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
+[params]
+  # Basic Site Info
+  description = "Engineering, Woodworking, and Home Automation."
+
+  # Search Config (Runs entirely in the browser)
+  [params.search]
+    enable = true
+    type = "flexsearch"
+  
+  # Navigation Bar
+  [params.navbar]
+    displayTitle = true
+    displayLogo = false
+    
+  # Footer Config
+  [params.footer]
+    enable = true
+    displayCopyright = true
+    copyright = "© 2026 Rohan. Photos All Rights Reserved. Code licensed under MIT."
+    displayPoweredBy = false # Hides the "Powered by Hugo" text for a cleaner look
+
+# Top Navigation Menu
+[menu]
+  # Search Bar (must be the last item usually)
+  [[menu.main]]
+    name = "Search"
+    weight = 10
+    params = { type = "search" }
+
+  # GitHub Link with Icon
+  [[menu.main]]
+    name = "GitHub"
+    weight = 20
+    url = "https://github.com/rkoripalli"
+    [menu.main.params]
+      icon = "github"
+  # LinkedIn Link with Icon
+  [[menu.main]]
+    name = "LinkedIn"
+    weight = 20
+    url = "https://linkedin.com/in/rkoripalli"
+    [menu.main.params]
+      icon = "linkedin"
+  #RSS
+  [[menu.main]]
+    name = "RSS"
+    weight = 20
+    url = "/index.xml"
+    [menu.main.params]
+      icon = "rss"
+
