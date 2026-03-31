@@ -20,3 +20,4 @@ Desktop.ini
 node_modules/
 
 .hugo_build.lock
+.aider*

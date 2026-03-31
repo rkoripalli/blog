@@ -19,9 +19,17 @@
 
 ## Fresh off the Press
 
+{{< hextra/feature-grid >}}
+{{< hextra/feature-card
+  title="Lumber Rack"
+  subtitle="Adding storage to the garage."
+  link="posts/lumber-rack/"
+  icon="star"
+>}}
 {{< hextra/feature-card
   title="A New Foundation"
   subtitle="My first update: Moving into the new home."
   link="posts/new-foundation/"
   icon="star"
 >}}
+{{< /hextra/feature-grid >}}
