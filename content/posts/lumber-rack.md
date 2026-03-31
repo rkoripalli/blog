@@ -1,4 +1,4 @@
-# Engineering an Ultra-Low Profile Overhead Lumber Rack
+# Building a Low Profile Overhead Lumber Rack
 
 When you’re working in a garage with a low bulkhead, every inch of headroom is a premium. I needed a way to store my lumber stash without creating a head-height hazard. The result is this **93" Balanced-T Overhead Rack**.
 
