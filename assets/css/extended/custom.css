@@ -1,0 +1,168 @@
+/* ---------------------------------------------------------------------------
+   Dark aurora theme — matches the homelab app family
+   (bg #0f1117, surface #1a1d27, accent indigo #6366f1)
+   PaperMod override surface: assets/css/extended/*.css loads after theme CSS.
+--------------------------------------------------------------------------- */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+    --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+    /* light mode: near-white with the same indigo accent */
+    --theme: #fafafc;
+    --entry: #ffffff;
+    --primary: #1a1d27;
+    --secondary: #565b6e;
+    --tertiary: #e4e6ee;
+    --content: #23263a;
+    --code-bg: #eef0f6;
+    --border: #e2e4ec;
+    --accent: #4f51d8;
+    --accent-soft: #6366f1;
+}
+
+:root[data-theme="dark"] {
+    --theme: #0f1117;
+    --entry: #1a1d27;
+    --primary: #e5e7ef;
+    --secondary: #9aa0b4;
+    --tertiary: #2b3040;
+    --content: #c8ccda;
+    --code-block-bg: #161925;
+    --code-bg: #222636;
+    --border: #262a38;
+    --accent: #818cf8;
+    --accent-soft: #a5b4fc;
+}
+
+body {
+    font-family: var(--font-sans);
+}
+
+code, pre, kbd {
+    font-family: var(--font-mono);
+}
+
+h1, h2, h3, h4 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+::selection {
+    background: #6366f1;
+    color: #ffffff;
+}
+
+/* --- indigo accent ------------------------------------------------------ */
+
+.post-content a,
+.post-entry .entry-content a,
+.breadcrumbs a:hover,
+.paginav a:hover .title {
+    color: var(--accent);
+}
+
+.post-content a {
+    box-shadow: 0 1px 0 var(--accent);
+}
+
+.post-content a:hover {
+    color: var(--accent-soft);
+    box-shadow: 0 2px 0 var(--accent-soft);
+}
+
+.post-content a code {
+    color: var(--accent);
+}
+
+/* tags / labels */
+.post-tags li,
+.terms-tags li {
+    background: var(--entry);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    transition: border-color 0.15s ease;
+}
+
+.post-tags a,
+.terms-tags a {
+    color: var(--secondary);
+    background: transparent;
+}
+
+.post-tags li:hover,
+.terms-tags li:hover {
+    border-color: var(--accent);
+    background: var(--entry);
+}
+
+.post-tags li:hover a,
+.terms-tags li:hover a {
+    color: var(--accent);
+    background: transparent;
+}
+
+/* profile-mode buttons */
+.profile .buttons .button {
+    background: var(--entry);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.profile .buttons .button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* post cards: subtle indigo edge on hover */
+.post-entry {
+    border: 1px solid var(--border);
+    transition: border-color 0.15s ease;
+}
+
+.post-entry:hover {
+    border-color: var(--accent);
+}
+
+.entry-hint,
+.entry-footer {
+    color: var(--secondary);
+}
+
+/* active menu item + hover */
+#menu a:hover,
+.logo a:hover {
+    color: var(--accent);
+}
+
+/* first-entry (pinned/latest) title pops */
+.first-entry .entry-header h1,
+.first-entry .entry-header h2 {
+    color: var(--primary);
+}
+
+/* table-of-contents accent rail */
+.toc {
+    border: 1px solid var(--border);
+    background: var(--entry);
+}
+
+.toc a:hover {
+    color: var(--accent);
+}
+
+/* code block frame */
+.post-content pre,
+.post-content .highlight {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+/* scroll-to-top + theme toggle hover */
+.top-link:hover,
+#theme-toggle:hover svg {
+    color: var(--accent);
+}

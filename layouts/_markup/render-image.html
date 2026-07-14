@@ -1,0 +1,3 @@
+{{- /* Rewrite root-absolute image paths (/images/...) through relURL so they
+     resolve under the /blog/ base path on GitHub Pages. */ -}}
+<img loading="lazy" src="{{ if strings.HasPrefix .Destination "/" }}{{ .Destination | strings.TrimPrefix "/" | relURL }}{{ else }}{{ .Destination }}{{ end }}" alt="{{ .PlainText }}"{{ with .Title }} title="{{ . }}"{{ end }}>

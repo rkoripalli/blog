@@ -1,62 +1,90 @@
-baseURL = 'https://rkoripalli.github.io/'
+baseURL = 'https://rkoripalli.github.io/blog/'
 languageCode = 'en-us'
 title = 'Rohan Koripalli'
-theme = 'hextra'
+theme = 'PaperMod'
+copyright = "© 2026 Rohan. Photos All Rights Reserved. Code licensed under MIT."
 
-# Required for the "Fancy" homepage blocks to work
+enableRobotsTXT = true
+
+[pagination]
+  pagerSize = 8
+
+# JSON output on home powers PaperMod's Fuse.js search page
+[outputs]
+  home = ['HTML', 'RSS', 'JSON']
+
 [markup]
   [markup.goldmark]
     [markup.goldmark.renderer]
-      unsafe = true
+      unsafe = true # posts use raw HTML (e.g. sized images in lumber-rack)
+  [markup.highlight]
+    noClasses = false
+    codeFences = true
+    guessSyntax = true
 
 [params]
-  # Basic Site Info
   description = "Engineering, Woodworking, and Home Automation."
+  keywords = ["blog", "engineering", "woodworking", "home automation", "homelab"]
+  defaultTheme = "dark"
+  disableThemeToggle = false
 
-  # Search Config (Runs entirely in the browser)
-  [params.search]
-    enable = true
-    type = "flexsearch"
-  
-  # Navigation Bar
-  [params.navbar]
-    displayTitle = true
-    displayLogo = false
-    
-  # Footer Config
-  [params.footer]
-    enable = true
-    displayCopyright = true
-    copyright = "© 2026 Rohan. Photos All Rights Reserved. Code licensed under MIT."
-    displayPoweredBy = false # Hides the "Powered by Hugo" text for a cleaner look
+  ShowReadingTime = true
+  ShowShareButtons = false
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  ShowRssButtonInSectionTermList = true
+  ShowToc = true
+  ShowWordCount = false
+  hideFooter = false
 
-# Top Navigation Menu
-[menu]
-  # Search Bar (must be the last item usually)
-  [[menu.main]]
-    name = "Search"
-    weight = 10
-    params = { type = "search" }
+  [params.profileMode]
+    enabled = true
+    title = "Hi, I'm Rohan!"
+    subtitle = "Welcome to my blog where I document my projects, related to my many interests including, my 1996 Ford F150, self hosting, mentoring FIRST Robotics, and lately my new home."
+    imageUrl = "images/me.jfif"
+    imageWidth = 160
+    imageHeight = 160
+    imageTitle = "Rohan"
+    [[params.profileMode.buttons]]
+      name = "Posts"
+      url = "posts"
+    [[params.profileMode.buttons]]
+      name = "Tags"
+      url = "tags"
 
-  # GitHub Link with Icon
-  [[menu.main]]
-    name = "GitHub"
-    weight = 20
+  [[params.socialIcons]]
+    name = "github"
     url = "https://github.com/rkoripalli"
-    [menu.main.params]
-      icon = "github"
-  # LinkedIn Link with Icon
-  [[menu.main]]
-    name = "LinkedIn"
-    weight = 20
+  [[params.socialIcons]]
+    name = "linkedin"
     url = "https://linkedin.com/in/rkoripalli"
-    [menu.main.params]
-      icon = "linkedin"
-  #RSS
-  [[menu.main]]
-    name = "RSS"
-    weight = 20
-    url = "/index.xml"
-    [menu.main.params]
-      icon = "rss"
+  [[params.socialIcons]]
+    name = "rss"
+    url = "index.xml"
 
+  [params.assets]
+    disableHLJS = true # use Chroma (noClasses=false) instead of highlight.js
+
+  [params.fuseOpts]
+    isCaseSensitive = false
+    shouldSort = true
+    minMatchCharLength = 2
+    keys = ["title", "permalink", "summary", "content"]
+
+[menu]
+  [[menu.main]]
+    identifier = "posts"
+    name = "Posts"
+    url = "/posts/"
+    weight = 10
+  [[menu.main]]
+    identifier = "tags"
+    name = "Tags"
+    url = "/tags/"
+    weight = 20
+  [[menu.main]]
+    identifier = "search"
+    name = "Search"
+    url = "/search/"
+    weight = 30

@@ -1,11 +1,19 @@
-# Building a Low Profile Overhead Lumber Rack
+---
+title: "Building a Low Profile Overhead Lumber Rack"
+date: 2026-03-30
+draft: false
+tags: ["woodworking", "garage", "projects"]
+cover:
+  image: "images/lumber-rack/front.png"
+  alt: "The finished overhead lumber rack, loaded with boards"
+---
 
 When you’re working in a garage with a low bulkhead, every inch of headroom is a premium. I needed a way to store my lumber stash without creating a head-height hazard. The result is this **93" Balanced-T Overhead Rack**.
 
 ## The Design Concept
 My garage is designed with a wall between the two car garage door and the one car garage door due to the roof design. This leaves a significant amount of wasted space but also provides an opportunity for some overhead storage. The core of this build is a **torsion-grid frame** designed to be installed solo. By orienting the 2x4 arms and rails "on the flat" (1.5" thickness), the entire structure only drops 3.5" from the header. I did a rough 3D model in Onshape, and used Gemini to help with ideation and structural analysis.
 
-![alt text](/images/lumber-rack/onshape.png)
+![Onshape 3D model of the torsion-grid rack](/images/lumber-rack/onshape.png)
 
 ### Key Specs:
 * **Total Span:** 93 inches (fitting perfectly into the bulkhead opening).
@@ -31,9 +39,9 @@ The trick to a one-person install on a 90" rack is doing it in stages:
 ## Final Results
 The rack is rock-solid. Even fully loaded with premium walnut and plywood, there is zero visible deflection, and I can do pull ups without any hesitation. It’s tucked high enough that it doesn't interfere with walking around the garage, while keeping the lumber organized and off the floor.
 
-![alt text](/images/lumber-rack/front.png)
-![alt text](/images/lumber-rack/back.png)
-![alt text](/images/lumber-rack/bottom.png)
+![Front view of the loaded rack](/images/lumber-rack/front.png)
+![Back view showing the wall-anchored endcaps](/images/lumber-rack/back.png)
+![View from below showing the support arms](/images/lumber-rack/bottom.png)
 ---
 
 ### Bill of Materials:
