@@ -4,12 +4,6 @@
 
 (empty — items here are ready for an agent to execute)
 
-## Blocked on Rohan
-
-- **Buttondown account** — create at buttondown.com (pick username, ideally `rkoripalli`), then in
-  Settings → RSS automation add feed `https://rkoripalli.github.io/blog/index.xml`. Hand the
-  username back → uncomment `buttondownUsername` in `hugo.toml` and the subscribe box goes live.
-
 ## Proposed
 
 - Write next post — pick from `post-ideas.md` (top candidates: local-first AI agents, ZFS watchdog war story, lumber rack follow-up)
@@ -22,4 +16,5 @@
 
 ## Done
 
+- 2026-07-14 — Buttondown email subscriptions live (username `rkoripalli`, RSS automation on index.xml; end-of-post subscribe box)
 - 2026-07-14 — Migrated Hextra → PaperMod, dark aurora theme, baseURL fix, lumber-rack frontmatter fix, image render hook, docs + KB created
