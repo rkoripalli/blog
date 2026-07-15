@@ -38,6 +38,12 @@ enableRobotsTXT = true
   ShowWordCount = false
   hideFooter = false
 
+  # End-of-post email subscribe box (rendered via the comments hook,
+  # layouts/_partials/comments.html). The box only appears once
+  # buttondownUsername is set to the Buttondown account name.
+  comments = true
+  # buttondownUsername = "rkoripalli"
+
   [params.profileMode]
     enabled = true
     title = "Hi, I'm Rohan!"

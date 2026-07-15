@@ -48,6 +48,14 @@ Template overrides (kept minimal, re-sync when updating the theme submodule):
   tokens/keys, camera positions, or floor-plan-level home-security detail. Projects can be
   described architecturally ("an LXC on Proxmox") without the specifics in the homelab KB.
 
+## Email subscriptions (Buttondown)
+
+End-of-post subscribe box in `layouts/_partials/comments.html` (rendered via PaperMod's comments
+hook, `params.comments = true`). It only appears when `params.buttondownUsername` is set in
+`hugo.toml` — uncomment and set it once the Buttondown account exists. New-post emails are sent by
+Buttondown's RSS-to-email automation watching `https://rkoripalli.github.io/blog/index.xml`
+(configured in the Buttondown dashboard, not in this repo).
+
 ## Backlog
 
 `blog-kb/TODO.md` (Approved Queue + Proposed). Post ideas: `blog-kb/post-ideas.md`.

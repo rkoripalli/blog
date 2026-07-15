@@ -4,6 +4,12 @@
 
 (empty — items here are ready for an agent to execute)
 
+## Blocked on Rohan
+
+- **Buttondown account** — create at buttondown.com (pick username, ideally `rkoripalli`), then in
+  Settings → RSS automation add feed `https://rkoripalli.github.io/blog/index.xml`. Hand the
+  username back → uncomment `buttondownUsername` in `hugo.toml` and the subscribe box goes live.
+
 ## Proposed
 
 - Write next post — pick from `post-ideas.md` (top candidates: local-first AI agents, ZFS watchdog war story, lumber rack follow-up)

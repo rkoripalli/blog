@@ -1,0 +1,18 @@
+{{- /* Rendered at the end of each post via PaperMod's comments hook (params.comments = true).
+     Shows a Buttondown email-subscribe box when params.buttondownUsername is set. */ -}}
+{{- with site.Params.buttondownUsername }}
+<div class="subscribe-box">
+    <p class="subscribe-title">Get new posts by email</p>
+    <p class="subscribe-sub">No spam, unsubscribe whenever. Or grab the <a href="{{ "index.xml" | relURL }}">RSS feed</a>.</p>
+    <form
+        action="https://buttondown.com/api/emails/embed-subscribe/{{ . }}"
+        method="post"
+        target="popupwindow"
+        onsubmit="window.open('https://buttondown.com/{{ . }}', 'popupwindow')"
+        class="subscribe-form"
+    >
+        <input type="email" name="email" placeholder="you@example.com" required aria-label="Email address" />
+        <input type="submit" value="Subscribe" />
+    </form>
+</div>
+{{- end }}
