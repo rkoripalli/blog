@@ -42,7 +42,7 @@ enableRobotsTXT = true
   # layouts/_partials/comments.html). The box only appears once
   # buttondownUsername is set to the Buttondown account name.
   comments = true
-  # buttondownUsername = "rkoripalli"
+  buttondownUsername = "rkoripalli"
 
   [params.profileMode]
     enabled = true
