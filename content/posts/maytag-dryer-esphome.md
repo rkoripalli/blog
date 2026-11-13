@@ -1,6 +1,7 @@
 ---
 title: "Teaching My Dryer to Talk to Home Assistant"
 date: 2026-11-13
+description: "How I got local, cloud-free status from my Maytag dryer: backing up its Wi-Fi module, decoding the internal WIN bus, and a receive-only ESPHome sniffer for Home Assistant."
 draft: false
 tags: ["home automation", "esphome", "reverse engineering", "projects"]
 ---
