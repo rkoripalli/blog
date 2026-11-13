@@ -42,3 +42,10 @@ hostnames, VLAN maps, keys, camera positions). Voice: first-person build log, li
     tracker calibrated against watch TDEE data.
 14. **How this blog works** — Hugo + PaperMod + GitHub Actions + the dark aurora theme; the
     meta-post, links back to "A New Foundation".
+
+## o's picks (2026-11-13)
+
+- **Yes:** Game-day TV (drafting, branch post-tv-setup); Designing with Claude: the gallery wall
+  layout and frame picks (needs o's photos/mockups); Cheese photo booth (after the booth is finished).
+- **Interesting:** AI agents at home, framed around the LiteLLM proxy and model routing.
+- **Maybe:** Hall e-paper dashboard. **Hold:** 4Runner OBD. **No:** presence / who's home.
