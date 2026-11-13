@@ -1,0 +1,25 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getPosts, url, tagSlug, tagLabel } from '../../lib/site';
+const posts = await getPosts();
+const counts = new Map<string, { label: string; n: number }>();
+for (const p of posts) for (const t of p.data.tags) {
+  const s = tagSlug(t);
+  counts.set(s, { label: tagLabel(t), n: (counts.get(s)?.n ?? 0) + 1 });
+}
+const tags = [...counts.entries()].sort((a, b) => b[1].n - a[1].n || a[1].label.localeCompare(b[1].label));
+---
+<Base title="Topics" description="Build logs grouped by topic." nav="topics">
+  <section class="page-title">
+    <p class="label label-mark">Index by discipline</p>
+    <h1 class="display">Topics</h1>
+  </section>
+  <div class="index-list">
+    {tags.map(([slug, t]) => (
+      <a class="index-row" href={url(`tags/${slug}/`)} style="grid-template-columns: minmax(0, 1fr) auto">
+        <h2 class="display">{t.label}</h2>
+        <span class="meta">{t.n} {t.n === 1 ? 'log' : 'logs'}</span>
+      </a>
+    ))}
+  </div>
+</Base>

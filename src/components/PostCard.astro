@@ -1,0 +1,52 @@
+---
+import { url, tagLabel, isoDate, summary, coverUrl, type Post } from '../lib/site';
+interface Props { post: Post; feature?: boolean }
+const { post, feature = false } = Astro.props;
+const href = url(`posts/${post.id}/`);
+const cover = coverUrl(post);
+const firstTag = post.data.tags[0];
+---
+{feature ? (
+  <a class="card card-feature" href={href}>
+    {cover && (
+      <div class="card-media">
+        <img src={cover} alt={post.data.cover?.alt ?? ''} />
+        <span class="callout">Detail A</span>
+      </div>
+    )}
+    <div class="card-side">
+      <div class="card-body">
+        <p class="label label-mark">Sheet {post.sheet} · Latest</p>
+        <h3 class="display card-title">{post.data.title}</h3>
+        <p>{summary(post)}</p>
+      </div>
+      <dl class="title-block" style="grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0">
+        <div><dt>Date</dt><dd>{isoDate(post.data.date)}</dd></div>
+        <div><dt>Read</dt><dd>{post.minutes} min</dd></div>
+        <div><dt>Discipline</dt><dd>{firstTag ? tagLabel(firstTag) : 'Notes'}</dd></div>
+      </dl>
+    </div>
+  </a>
+) : (
+  <a class="card" href={href}>
+    {cover ? (
+      <div class="card-media"><img src={cover} alt={post.data.cover?.alt ?? ''} loading="lazy" /></div>
+    ) : (
+      <div class="card-blank" aria-hidden="true">
+        <svg width="220" height="120" viewBox="0 0 220 120" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M20 100 L20 50 L110 10 L200 50 L200 100 Z" />
+          <path d="M80 100 L80 65 L120 65 L120 100" />
+          <path d="M145 60 h30 v22 h-30 z" />
+          <path d="M20 112 h180" stroke-dasharray="4 4" />
+          <path d="M20 108 v8 M200 108 v8" />
+        </svg>
+      </div>
+    )}
+    <div class="card-body">
+      <p class="label label-mark">Sheet {post.sheet}{firstTag && ` · ${tagLabel(firstTag)}`}</p>
+      <h3 class="display card-title">{post.data.title}</h3>
+      <p>{summary(post, 140)}</p>
+      <p class="label">{isoDate(post.data.date)} · {post.minutes} min</p>
+    </div>
+  </a>
+)}

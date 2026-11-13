@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+import PostCard from '../components/PostCard.astro';
+import Subscribe from '../components/Subscribe.astro';
+import { getPosts, url } from '../lib/site';
+
+const posts = await getPosts();
+const [latest, ...rest] = posts;
+const lastRev = latest ? latest.data.date.toISOString().slice(0, 7) : '';
+---
+<Base nav="home">
+  <section class="hero">
+    <div class="hero-text">
+      <p class="label label-mark">Dwg 000 · General arrangement</p>
+      <h1 class="display">Notes from a house that's <em>never quite finished</em>.</h1>
+      <p>
+        Build logs from my house, my 1996 F-150, my homelab and the FIRST Robotics team I mentor.
+        Drawings, wiring, code, and what I'd change next time.
+      </p>
+    </div>
+    <div class="hero-card">
+      <img src={url('images/me.png')} alt="Rohan" width="242" height="242" />
+      <dl class="title-block" style="margin: 0">
+        <div><dt>Drawn by</dt><dd>Rohan K.</dd></div>
+        <div><dt>Location</dt><dd>Texas</dd></div>
+        <div><dt>Logs</dt><dd>{String(posts.length).padStart(3, '0')}</dd></div>
+        <div><dt>Rev</dt><dd>{lastRev}</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section aria-labelledby="sheet-index" style="display: flex; flex-direction: column; gap: 28px">
+    <div class="section-head">
+      <h2 id="sheet-index">Sheet index</h2>
+      <span class="leader" aria-hidden="true"></span>
+      <a href={url('posts/')}>All logs →</a>
+    </div>
+    {latest && <PostCard post={latest} feature />}
+    {rest.length > 0 && (
+      <div class="card-grid">
+        {rest.slice(0, 4).map((p) => <PostCard post={p} />)}
+      </div>
+    )}
+  </section>
+
+  <Subscribe />
+</Base>

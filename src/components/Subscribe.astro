@@ -1,0 +1,22 @@
+---
+import { SITE, url } from '../lib/site';
+const { heading = 'Get the next sheet by email' } = Astro.props;
+---
+{SITE.buttondownUsername && (
+  <section class="subscribe" aria-label="Email subscription">
+    <div class="subscribe-text">
+      <h2 class="display">{heading}</h2>
+      <p>No spam, unsubscribe whenever. Or grab the <a href={url('index.xml')}>RSS feed</a>.</p>
+    </div>
+    <form
+      action={`https://buttondown.com/api/emails/embed-subscribe/${SITE.buttondownUsername}`}
+      method="post"
+      target="popupwindow"
+      onsubmit={`window.open('https://buttondown.com/${SITE.buttondownUsername}', 'popupwindow')`}
+    >
+      <label class="sr-only" for="subscribe-email">Email address</label>
+      <input id="subscribe-email" type="email" name="email" placeholder="you@example.com" required />
+      <button class="btn" type="submit">Subscribe</button>
+    </form>
+  </section>
+)}

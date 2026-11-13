@@ -9,6 +9,8 @@ cover:
   alt: "The Whirlpool RIGEL Wi-Fi board out of the dryer console, with the Espressif module on it"
 ---
 
+import FrameDecoder from '../../components/FrameDecoder.astro';
+
 All I wanted was a notification when the dryer finished. The washer already tells Home Assistant when it's done, so the clothes sitting damp in the dryer for three hours had become the weak link. The dryer is a Maytag MGD7230HW3, and it *does* have Wi-Fi. It just only talks to Whirlpool's cloud and their app.
 
 This is the story of getting that status locally instead, one wire at a time. The code and notes are on GitHub: [maytag-dryer-esphome](https://github.com/rkoripalli/maytag-dryer-esphome).
@@ -72,6 +74,32 @@ Then came the fun part: doing something to the dryer and watching what changed. 
 - one byte for the door
 - two bytes for **seconds remaining**
 - bytes for the cycle phase, including cooldown
+
+<FrameDecoder
+  title="Fig · 0B 23 machine status broadcast"
+  frame="FE 10 02 1F 34 11 0B 23 00 0D 15 00 00 02 01 01 2C 00 00 02 05 B0 00 1E"
+  initial={7}
+  crc={{ poly: 0x31, init: 0xff, from: 3, to: 22, at: 23 }}
+  caption="An example status frame built from the decoded fields: running, door closed, five minutes left, in cooldown. Bytes I haven't mapped yet are shown as zeros."
+  fields={[
+    { from: 0, to: 0, kind: 'frame', name: 'Preamble', text: 'The bitwise NOT of the sending node. FE means node 1, the main control board.' },
+    { from: 1, to: 2, kind: 'frame', name: 'Start of frame', text: 'Every frame opens with 10 02, so the listener can lock on even if it joins mid-stream.' },
+    { from: 3, to: 3, kind: 'header', name: 'Address', text: 'Sender in the top half, receiver in the bottom. 1F is the main control (1) broadcasting to everyone (F).' },
+    { from: 4, to: 4, kind: 'header', name: 'Sequence', text: 'A rolling counter in the high nibble. The low nibble is always 4 (flags).' },
+    { from: 5, to: 5, kind: 'header', name: 'Length', text: '0x11, so 17 payload bytes follow.' },
+    { from: 6, to: 7, kind: 'header', name: 'Message type', text: '0B 23 is the machine status broadcast. The main board sends it about once a second, and again whenever something changes.' },
+    { from: 8, to: 12, kind: 'unknown', name: 'State detail', text: 'Previous state and other details. 0D shows up when Quick Dry is selected. Not fully mapped.' },
+    { from: 13, to: 13, kind: 'data', name: 'Machine state', text: '01 idle, 02 running, 05 paused, 04 complete. Laundry done is this byte going from 02 to 04.' },
+    { from: 14, to: 14, kind: 'data', name: 'Door', text: '01 means the door is closed, 00 means open.' },
+    { from: 15, to: 16, kind: 'data', name: 'Seconds remaining', text: 'Big-endian, so 01 2C is 300 seconds: five minutes left. It reads FF FF once the cycle ends.' },
+    { from: 17, to: 18, kind: 'unknown', name: 'Unmapped', text: 'Not decoded yet.' },
+    { from: 19, to: 19, kind: 'data', name: 'Cycle phase', text: '02 is cooldown, the tumble without heat at the end of a cycle.' },
+    { from: 20, to: 20, kind: 'data', name: 'Sub-phase', text: 'Goes to 05 while running and 01 at the end.' },
+    { from: 21, to: 21, kind: 'unknown', name: 'Flags', text: 'Bit flags. Bit 7 clears late in the cycle, maybe when the heat turns off. The rest are unknown.' },
+    { from: 22, to: 22, kind: 'unknown', name: 'Unmapped', text: 'Not decoded yet.' },
+    { from: 23, to: 23, kind: 'check', name: 'CRC-8', text: 'Polynomial 0x31, starting value FF, over the address through the end of the payload. It matched all 400 frames in the first capture.' },
+  ]}
+/>
 
 Turning the cycle knob through every position mapped the cycle IDs. Sending settings from the Maytag app showed how the module writes a whole settings record to the main board, and it even turned up a one-shot command byte that switches the drum light.
 

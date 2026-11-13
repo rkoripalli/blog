@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+import { url } from '../lib/site';
+---
+<Base title="Search" description="Search every build log." nav="search">
+  <section class="page-title">
+    <p class="label label-mark">Find a sheet</p>
+    <h1 class="display">Search</h1>
+  </section>
+  <div style="display: flex; flex-direction: column; gap: 20px">
+    <label class="sr-only" for="q">Search logs</label>
+    <input id="q" class="search-box" type="search" placeholder="Try “esphome” or “lumber”" autocomplete="off" data-index={url('search.json')} />
+    <p id="status" class="label" aria-live="polite">Type at least two letters.</p>
+    <div id="results" class="index-list" hidden></div>
+  </div>
+  <script>
+    const input = document.getElementById('q') as HTMLInputElement;
+    const status = document.getElementById('status')!;
+    const results = document.getElementById('results')!;
+    type Item = { title: string; url: string; date: string; sheet: string; summary: string; tags: string[]; text: string };
+    let index: Item[] | null = null;
+    const load = async () => (index ??= await (await fetch(input.dataset.index!)).json());
+    const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+    const run = async () => {
+      const q = input.value.trim().toLowerCase();
+      if (q.length < 2) { results.hidden = true; status.textContent = 'Type at least two letters.'; return; }
+      const items = await load();
+      const words = q.split(/\s+/);
+      const scored = items
+        .map((it) => {
+          const hay = (it.title + ' ' + it.tags.join(' ')).toLowerCase();
+          let score = 0;
+          for (const w of words) {
+            if (hay.includes(w)) score += 5;
+            else if (it.text.includes(w)) score += 1;
+            else return null;
+          }
+          return { it, score };
+        })
+        .filter(Boolean)
+        .sort((a, b) => b!.score - a!.score) as { it: Item }[];
+      status.textContent = scored.length ? `${scored.length} ${scored.length === 1 ? 'match' : 'matches'}` : 'No matches.';
+      results.hidden = !scored.length;
+      results.innerHTML = scored
+        .map(({ it }) => `<a class="index-row" href="${it.url}"><span class="label label-mark">Sheet ${it.sheet}</span><div><h2 class="display">${esc(it.title)}</h2><p>${esc(it.summary)}</p></div><span class="meta">${it.date}</span></a>`)
+        .join('');
+    };
+    input.addEventListener('input', run);
+    const pre = new URLSearchParams(location.search).get('q');
+    if (pre) { input.value = pre; run(); }
+  </script>
+</Base>

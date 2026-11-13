@@ -1,0 +1,127 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Subscribe from '../../components/Subscribe.astro';
+import { getPosts, url, tagSlug, tagLabel, isoDate, summary, coverUrl, type Post } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: { post, newer: posts[i - 1], older: posts[i + 1] },
+  }));
+}
+
+interface Props { post: Post; newer?: Post; older?: Post }
+const { post, newer, older } = Astro.props;
+const { Content, headings } = await render(post);
+const sections = headings.filter((h) => h.depth === 2);
+const cover = coverUrl(post);
+const firstTag = post.data.tags[0];
+---
+<Base
+  title={post.data.title}
+  description={summary(post)}
+  image={cover}
+  type="article"
+  published={post.data.date}
+  nav="logs"
+>
+  <article style="display: contents">
+    <header class="post-head">
+      <div class="post-head-text">
+        <p class="label label-mark">Sheet {post.sheet}{firstTag && ` · ${tagLabel(firstTag)}`}</p>
+        <h1 class="display">{post.data.title}</h1>
+        {post.data.description && <p class="dek">{post.data.description}</p>}
+      </div>
+      <dl class="title-block" style="margin: 0">
+        <div><dt>Date</dt><dd><time datetime={post.data.date.toISOString()}>{isoDate(post.data.date)}</time></dd></div>
+        <div><dt>Read</dt><dd>{post.minutes} min</dd></div>
+        <div><dt>Sheet</dt><dd>{post.sheet}</dd></div>
+        <div><dt>Sections</dt><dd>{sections.length || '—'}</dd></div>
+      </dl>
+    </header>
+
+    {cover && (
+      <figure class="post-cover">
+        <img src={cover} alt={post.data.cover?.alt ?? ''} />
+        <figcaption>Detail A</figcaption>
+      </figure>
+    )}
+
+    <div class="post-layout">
+      {sections.length > 2 && (
+        <aside class="toc" aria-label="Contents">
+          <p class="label">Sheet contents</p>
+          <ol>
+            {sections.map((h) => <li><a href={`#${h.slug}`}>{h.text.replace(/^Step \d+:\s*/, '')}</a></li>)}
+          </ol>
+        </aside>
+      )}
+      <div class="prose">
+        <Content />
+        {post.data.tags.length > 0 && (
+          <div class="tags" aria-label="Topics">
+            {post.data.tags.map((t) => <a class="tag" href={url(`tags/${tagSlug(t)}/`)}>{tagLabel(t)}</a>)}
+          </div>
+        )}
+      </div>
+    </div>
+  </article>
+
+  {(older || newer) && (
+    <nav class="pager" aria-label="More logs">
+      {older && (
+        <a href={url(`posts/${older.id}/`)}>
+          <span class="label">← Previous sheet</span>
+          <span class="display">{older.data.title}</span>
+        </a>
+      )}
+      {newer && (
+        <a class="next" href={url(`posts/${newer.id}/`)}>
+          <span class="label">Next sheet →</span>
+          <span class="display">{newer.data.title}</span>
+        </a>
+      )}
+    </nav>
+  )}
+
+  <Subscribe />
+
+  <script>
+    // Copy buttons on code blocks
+    document.querySelectorAll<HTMLPreElement>('.prose pre').forEach((pre) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'copy-btn';
+      btn.textContent = 'Copy';
+      btn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(pre.querySelector('code')?.innerText ?? pre.innerText);
+          btn.textContent = 'Copied';
+        } catch {
+          btn.textContent = 'Press Ctrl+C';
+        }
+        setTimeout(() => (btn.textContent = 'Copy'), 1600);
+      });
+      pre.appendChild(btn);
+    });
+
+    // Highlight the section being read in the contents box
+    const links = new Map<string, HTMLAnchorElement>();
+    document.querySelectorAll<HTMLAnchorElement>('.toc a').forEach((a) => links.set(a.hash.slice(1), a));
+    if (links.size && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (!e.isIntersecting) return;
+            links.forEach((a) => a.classList.remove('active'));
+            links.get(e.target.id)?.classList.add('active');
+          });
+        },
+        { rootMargin: '0px 0px -70% 0px' },
+      );
+      document.querySelectorAll('.prose h2[id]').forEach((h) => io.observe(h));
+    }
+  </script>
+</Base>

@@ -1,0 +1,11 @@
+---
+import Base from '../layouts/Base.astro';
+import { url } from '../lib/site';
+---
+<Base title="Sheet not found">
+  <section class="page-title" style="padding-block: 40px">
+    <p class="label label-mark">Error 404 · Missing sheet</p>
+    <h1 class="display">This sheet isn't in the set.</h1>
+    <p style="margin: 0; font-size: 18px; line-height: 1.6">It may have moved. Try the <a href={url('posts/')}>sheet index</a> or <a href={url('search/')}>search</a>.</p>
+  </section>
+</Base>

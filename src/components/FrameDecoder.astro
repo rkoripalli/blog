@@ -1,0 +1,124 @@
+---
+/**
+ * Interactive byte-frame decoder for posts (use from .mdx).
+ *
+ * <FrameDecoder
+ *   title="0B 23 machine status"
+ *   frame="FE 10 02 1F 34 ..."
+ *   fields={[{ from: 0, to: 0, name: 'Preamble', kind: 'frame', text: '...' }, ...]}
+ *   crc={{ poly: 0x31, init: 0xff, from: 3, to: 22, at: 23 }}   // optional: verify a CRC-8 at build time
+ *   initial={9}                                                   // optional: field index selected first
+ * />
+ *
+ * Works without JavaScript (shows the field table); with JS, tapping a byte explains it.
+ */
+type Kind = 'frame' | 'header' | 'data' | 'unknown' | 'check';
+interface Field { from: number; to: number; name: string; text: string; kind?: Kind }
+interface Props {
+  title: string;
+  frame: string;
+  fields: Field[];
+  caption?: string;
+  initial?: number;
+  crc?: { poly: number; init: number; from: number; to: number; at: number };
+}
+
+const { title, frame, fields, caption, initial = 0, crc } = Astro.props;
+const bytes = frame.trim().split(/\s+/).map((h) => h.toUpperCase());
+const fieldOf = (i: number) => fields.findIndex((f) => i >= f.from && i <= f.to);
+
+let crcNote: string | undefined;
+if (crc) {
+  let c = crc.init;
+  for (let i = crc.from; i <= crc.to; i++) {
+    c ^= parseInt(bytes[i], 16);
+    for (let b = 0; b < 8; b++) c = c & 0x80 ? ((c << 1) ^ crc.poly) & 0xff : (c << 1) & 0xff;
+  }
+  const expect = parseInt(bytes[crc.at], 16);
+  crcNote = c === expect
+    ? `CRC-8 checks out: computed ${c.toString(16).toUpperCase().padStart(2, '0')}.`
+    : `CRC-8 mismatch: computed ${c.toString(16).toUpperCase().padStart(2, '0')}, frame says ${bytes[crc.at]}.`;
+}
+const start = fields[initial] ?? fields[0];
+const id = 'fd-' + Math.random().toString(36).slice(2, 8);
+---
+<figure class="frame-decoder" id={id} data-fields={JSON.stringify(fields)}>
+  <div class="fd-head">
+    <span>{title}</span>
+    <span class="fd-hint">Tap a byte</span>
+  </div>
+  <div class="fd-bytes" role="group" aria-label="Frame bytes">
+    {bytes.map((b, i) => {
+      const fi = fieldOf(i);
+      const kind = fields[fi]?.kind ?? 'unknown';
+      return (
+        <button
+          type="button"
+          class={`fd-byte k-${kind}`}
+          data-field={fi}
+          aria-pressed={fi === initial ? 'true' : 'false'}
+          aria-label={`Byte ${i}: ${b}, ${fields[fi]?.name ?? 'unknown'}`}
+        >{b}</button>
+      );
+    })}
+  </div>
+  <div class="fd-detail" aria-live="polite">
+    <p class={`fd-name k-${start.kind ?? 'unknown'}`}>{start.name}</p>
+    <p class="fd-text">{start.text}</p>
+  </div>
+  <noscript>
+    <ul class="fd-table">{fields.map((f) => <li><strong>{f.name}</strong> (bytes {f.from}{f.to !== f.from && `–${f.to}`}): {f.text}</li>)}</ul>
+  </noscript>
+  {(caption || crcNote) && <figcaption>{caption}{caption && crcNote && ' '}{crcNote}</figcaption>}
+</figure>
+
+<style>
+  .frame-decoder { margin: 6px 0; border: 1.5px solid var(--mark); background: rgba(8, 29, 56, 0.9); }
+  .fd-head {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px;
+    padding: 10px 16px; border-bottom: 1px solid var(--mark);
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mark);
+  }
+  .fd-hint { color: var(--line); }
+  .fd-bytes { padding: 20px 16px 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .fd-byte {
+    --c: var(--line);
+    width: 46px; height: 46px; border-radius: 0; cursor: pointer;
+    border: 1.5px solid var(--c); background: transparent; color: var(--c);
+    font-family: var(--font-mono); font-size: 16px; font-weight: 600;
+    transition: background-color 0.12s ease, color 0.12s ease;
+  }
+  .fd-byte:hover { background: rgba(255, 255, 255, 0.06); }
+  .fd-byte[aria-pressed='true'] { background: var(--c); color: var(--paper); }
+  .k-frame { --c: #8cbeff; }
+  .k-header { --c: #7ee0c3; }
+  .k-data { --c: #ffd166; }
+  .k-unknown { --c: #6f8fb8; }
+  .k-check { --c: #ff9e7a; }
+  .fd-detail { padding: 8px 16px 18px; display: flex; flex-direction: column; gap: 6px; min-height: 84px; }
+  .fd-name { margin: 0; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c); }
+  .fd-text { margin: 0; font-size: 16px !important; line-height: 1.55 !important; }
+  .fd-table { margin: 0; padding: 0 16px 16px 34px; font-size: 15px; }
+  .frame-decoder figcaption { border-top: 1px solid var(--mark); padding: 10px 16px; font-size: 14px; line-height: 1.5; color: var(--ink); }
+  @media (max-width: 520px) { .fd-byte { width: 40px; height: 40px; font-size: 14px; } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.frame-decoder').forEach((root) => {
+    const fields = JSON.parse(root.dataset.fields || '[]');
+    const name = root.querySelector('.fd-name')!;
+    const text = root.querySelector('.fd-text')!;
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('.fd-byte')];
+    btns.forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const fi = Number(btn.dataset.field);
+        const f = fields[fi];
+        if (!f) return;
+        btns.forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.field) === fi)));
+        name.className = `fd-name k-${f.kind ?? 'unknown'}`;
+        name.textContent = f.name;
+        text.textContent = f.text;
+      }),
+    );
+  });
+</script>
