@@ -23,9 +23,9 @@ The answer came back quickly: no. Whirlpool's appliance cloud runs on AWS IoT Co
 
 ## Step 2: Open the console, find the module
 
-With the dryer unplugged, a few screws on the back of the console let it tilt forward. The Wi-Fi lives on a small daughterboard: an Espressif-built ESP32 module Whirlpool calls **RIGEL**. ![The dryer's rating label: model MGD7230HW3, FCC ID 2AC7Z-RIGEL](/images/maytag-dryer-esphome/rating-label.jpg)
+![The dryer's rating label: model MGD7230HW3, FCC ID 2AC7Z-RIGEL](/images/maytag-dryer-esphome/rating-label.jpg)
 
-The rating label even lists the module's FCC ID, 2AC7Z-RIGEL. Its FCC filing included a datasheet with the full pinout, which was the best gift of the whole project. Two of those pads are labelled as the appliance bus, and four more are the standard ESP32 programming interface.
+With the dryer unplugged, a few screws on the back of the console let it tilt forward. The Wi-Fi lives on a small daughterboard: an Espressif-built ESP32 module Whirlpool calls **RIGEL**. The rating label even lists the module's FCC ID, 2AC7Z-RIGEL. Its FCC filing included a datasheet with the full pinout, which was the best gift of the whole project. Two of those pads are labelled as the appliance bus, and four more are the standard ESP32 programming interface.
 
 ![The RIGEL board out of the console, with the Espressif module at the bottom](/images/maytag-dryer-esphome/rigel-module.jpg)
 
