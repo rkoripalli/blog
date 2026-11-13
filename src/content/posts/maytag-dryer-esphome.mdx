@@ -21,13 +21,13 @@ I worked through this with Claude as a pair: it did a lot of the decoding, readi
 
 The first idea was the easy one. Some appliances can be fooled by pointing their cloud hostname at a local server. So I watched what the dryer did on the network and poked at the endpoints it uses.
 
-The answer came back quickly: no. Whirlpool's appliance cloud runs on AWS IoT Core, and the MQTT connection uses **mutual TLS**. The server asks the dryer for its own certificate, and the dryer checks the server against a set of public root certificates baked into its firmware. A fake local server can't pass either check. Dead end, but a useful one, because it told me the real path was *inside* the machine.
+The answer came back quickly: no. Whirlpool's appliance cloud runs on AWS IoT Core, and the MQTT connection uses **mutual TLS**. The server asks the dryer for its own certificate, and the dryer checks the server against a set of public root certificates baked into its firmware. A fake local server can't pass either check. Dead end, but a useful one, because it told me the real path was *inside* the machine. (Notes: [docs/cloud.md](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/docs/cloud.md).)
 
 ## Step 2: Open the console, find the module
 
 ![The dryer's rating label: model MGD7230HW3, FCC ID 2AC7Z-RIGEL](/images/maytag-dryer-esphome/rating-label.jpg)
 
-With the dryer unplugged, a few screws on the back of the console let it tilt forward. The Wi-Fi lives on a small daughterboard: an Espressif-built ESP32 module Whirlpool calls **RIGEL**. The rating label even lists the module's FCC ID, 2AC7Z-RIGEL. Its FCC filing included a datasheet with the full pinout, which was the best gift of the whole project. Two of those pads are labelled as the appliance bus, and four more are the standard ESP32 programming interface.
+With the dryer unplugged, a few screws on the back of the console let it tilt forward. The Wi-Fi lives on a small daughterboard: an Espressif-built ESP32 module Whirlpool calls **RIGEL**. The rating label even lists the module's FCC ID, 2AC7Z-RIGEL. Its FCC filing included a datasheet with the full pinout, which was the best gift of the whole project. Two of those pads are labelled as the appliance bus, and four more are the standard ESP32 programming interface. I wrote the pinout up in [docs/hardware.md](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/docs/hardware.md).
 
 ![The RIGEL board out of the console, with the Espressif module at the bottom](/images/maytag-dryer-esphome/rigel-module.jpg)
 
@@ -44,11 +44,11 @@ The long single read kept failing its final checksum (a marginal wire, probably)
 
 ![The flash read in progress: USB-serial adapter clipped to the module, esptool on screen](/images/maytag-dryer-esphome/flash-dump-setup.jpg)
 
-That backup stays private. It contains my Wi-Fi password, the unit's serial numbers and Whirlpool's code.
+That backup stays private. It contains my Wi-Fi password, the unit's serial numbers and Whirlpool's code. If you make your own, [tools/rigel_flash_decode.py](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/tools/rigel_flash_decode.py) summarises it without printing the sensitive parts.
 
 ## Step 4: Read the firmware for clues
 
-The firmware turned out to be written in JavaScript on the Moddable XS engine, which made the strings unusually readable. It gave us the vocabulary: names like `MachineState`, `STATE_ACU_RUNNING`, `Door_Status`, `Estimated_Time_Remaining`, and the classes that drive the internal bus, which Whirlpool calls **WIN**. There was even a built-in "sniffer" mode, a nice hint that listening to the bus is a normal thing to do.
+The firmware turned out to be written in JavaScript on the Moddable XS engine, which made the strings unusually readable. It gave us the vocabulary: names like `MachineState`, `STATE_ACU_RUNNING`, `Door_Status`, `Estimated_Time_Remaining`, and the classes that drive the internal bus, which Whirlpool calls **WIN**. There was even a built-in "sniffer" mode, a nice hint that listening to the bus is a normal thing to do. More in [docs/firmware-notes.md](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/docs/firmware-notes.md).
 
 What it *didn't* give us was the actual bytes: the baud rate, the frame layout, the checksum, or which number means "running". For that I needed to listen to a live dryer.
 
@@ -56,7 +56,7 @@ What it *didn't* give us was the actual bytes: the baud rate, the frame layout, 
 
 This was the key decision. The dryer's main control board does all the real work; the Wi-Fi module is just a bridge. So rather than replace the module, I added a second, tiny ESP32 (a Seeed XIAO ESP32-C3) wired **receive-only** to the bus pads. It can't send anything, so it can't confuse the dryer. The stock module and the Maytag app keep working exactly as before.
 
-The XIAO runs ESPHome. The first version just dumped raw hex to the log and let me switch baud rates from Home Assistant. 19200 was garbage, 57600 was garbage, **38400** was clean.
+The XIAO runs ESPHome. The [first version](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/esphome/maytag-win-capture-v1.yaml) just dumped raw hex to the log and let me switch baud rates from Home Assistant. 19200 was garbage, 57600 was garbage, **38400** was clean.
 
 ## Step 6: Decode the frames
 
@@ -66,7 +66,7 @@ With clean bytes, the structure jumped out:
 [~sender] 10 02  ADDR  SEQ  LEN  PAYLOAD…  CRC8   [10 06]
 ```
 
-Every frame starts with `10 02`, has an address byte (sender in the top half, receiver in the bottom), a length, the payload and a checksum. The checksum took some guessing, but CRC-8 with polynomial `0x31` matched all 400 frames in the first capture. There are three boards talking: the main control, the front panel, and the Wi-Fi module.
+Every frame starts with `10 02`, has an address byte (sender in the top half, receiver in the bottom), a length, the payload and a checksum. The checksum took some guessing, but CRC-8 with polynomial `0x31` matched all 400 frames in the first capture. There are three boards talking: the main control, the front panel, and the Wi-Fi module. The full field guide is in [docs/win-bus-protocol.md](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/docs/win-bus-protocol.md), and [tools/win_decode.py](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/tools/win_decode.py) decodes raw logs into frames.
 
 Then came the fun part: doing something to the dryer and watching what changed. I ran a short Quick Dry cycle while noting the time of everything I did: open the door, close it, start, pause, resume, change the temperature, toggle Wrinkle Prevent, wait for cooldown, finish. Lining those notes up against the capture made the main status message readable:
 
@@ -105,11 +105,17 @@ Turning the cycle knob through every position mapped the cycle IDs. Sending sett
 
 ## Step 7: Make it useful
 
-The final ESPHome config parses frames on the XIAO itself, checks the CRC, and publishes proper entities: dryer state, door, time remaining, cycle, temperature, dryness and Wrinkle Prevent. "Laundry done" is simply the state going from Running to Complete, and Home Assistant handles the notification from there, gated by whether we're home, asleep or have friends over.
+The [final ESPHome config](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/esphome/maytag-win-sniffer.yaml) parses frames on the XIAO itself, checks the CRC, and publishes proper entities: dryer state, door, time remaining, cycle, temperature, dryness and Wrinkle Prevent. "Laundry done" is simply the state going from Running to Complete, and Home Assistant handles the notification from there, gated by whether we're home, asleep or have friends over. There's a minimal [example automation](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/examples/ha-dryer-done.yaml) in the repo.
 
 ## Publishing it
 
 I couldn't find anyone who had documented this bus for a Whirlpool-family dryer, so I cleaned it up and published it. That meant leaving some things out on purpose: no firmware, no flash dump, no certificates, serial numbers or network details. The repo has the protocol notes, the hardware pinout, both ESPHome configs, a frame decoder, a tool that summarises your *own* flash dump while hiding the sensitive parts, and the decoded captures.
+
+- [README](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/README.md): start here
+- [WIN bus protocol](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/docs/win-bus-protocol.md): framing, nodes, the status and settings messages
+- [Hardware](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/docs/hardware.md): RIGEL pinout, backup and restore, sniffer wiring
+- [ESPHome sniffer](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/esphome/maytag-win-sniffer.yaml) and the [raw capture config](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/esphome/maytag-win-capture-v1.yaml)
+- [Captures](https://github.com/rkoripalli/maytag-dryer-esphome/tree/main/captures): decoded frames and the timed action markers from the test cycles
 
 ## What's next
 
