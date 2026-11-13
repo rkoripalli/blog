@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://rkoripalli.github.io/blog/sitemap-index.xml

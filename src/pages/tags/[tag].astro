@@ -1,0 +1,27 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPosts, url, tagSlug, tagLabel, type Post } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  const groups = new Map<string, { label: string; posts: Post[] }>();
+  for (const p of posts) for (const t of p.data.tags) {
+    const s = tagSlug(t);
+    const g = groups.get(s) ?? { label: tagLabel(t), posts: [] };
+    g.posts.push(p);
+    groups.set(s, g);
+  }
+  return [...groups.entries()].map(([tag, g]) => ({ params: { tag }, props: g }));
+}
+const { label, posts } = Astro.props;
+---
+<Base title={label} description={`Build logs about ${label.toLowerCase()}.`} nav="topics">
+  <section class="page-title">
+    <p class="label label-mark"><a href={url('tags/')}>Topics</a> · {posts.length} {posts.length === 1 ? 'log' : 'logs'}</p>
+    <h1 class="display">{label}</h1>
+  </section>
+  <div class="card-grid">
+    {posts.map((p) => <PostCard post={p} />)}
+  </div>
+</Base>

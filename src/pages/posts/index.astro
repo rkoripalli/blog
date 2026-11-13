@@ -1,0 +1,25 @@
+---
+import Base from '../../layouts/Base.astro';
+import Subscribe from '../../components/Subscribe.astro';
+import { getPosts, url, isoDate, summary, tagLabel } from '../../lib/site';
+const posts = await getPosts();
+---
+<Base title="All logs" description="Every build log, newest first." nav="logs">
+  <section class="page-title">
+    <p class="label label-mark">Sheet index · {posts.length} logs</p>
+    <h1 class="display">All logs</h1>
+  </section>
+  <div class="index-list">
+    {posts.map((p) => (
+      <a class="index-row" href={url(`posts/${p.id}/`)}>
+        <span class="label label-mark">Sheet {p.sheet}</span>
+        <div>
+          <h2 class="display">{p.data.title}</h2>
+          <p>{summary(p, 160)}</p>
+        </div>
+        <span class="meta">{isoDate(p.data.date)} · {p.minutes} min{p.data.tags[0] && ` · ${tagLabel(p.data.tags[0])}`}</span>
+      </a>
+    ))}
+  </div>
+  <Subscribe />
+</Base>
