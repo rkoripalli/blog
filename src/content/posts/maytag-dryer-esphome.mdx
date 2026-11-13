@@ -27,7 +27,17 @@ The answer came back quickly: no. Whirlpool's appliance cloud runs on AWS IoT Co
 
 ![The dryer's rating label: model MGD7230HW3, FCC ID 2AC7Z-RIGEL](/images/maytag-dryer-esphome/rating-label.jpg)
 
-With the dryer unplugged, a few screws on the back of the console let it tilt forward. The Wi-Fi lives on a small daughterboard: an Espressif-built ESP32 module Whirlpool calls **RIGEL**. The rating label even lists the module's FCC ID, 2AC7Z-RIGEL. Its FCC filing included a datasheet with the full pinout, which was the best gift of the whole project. Two of those pads are labelled as the appliance bus, and four more are the standard ESP32 programming interface. I wrote the pinout up in [docs/hardware.md](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/docs/hardware.md).
+With the dryer unplugged, a few screws on the back of the console let it tilt forward. The Wi-Fi lives on a small daughterboard: an Espressif-built ESP32 module Whirlpool calls **RIGEL**. The rating label even lists the module's FCC ID, 2AC7Z-RIGEL, and [its FCC filing](https://fccid.io/2AC7Z-RIGEL) is public.
+
+![The FCC listing for 2AC7Z-RIGEL: Espressif is the grantee, and the exhibits include internal photos and a user manual](/images/maytag-dryer-esphome/fcc-listing.png)
+
+The [internal photos](https://fccid.io/2AC7Z-RIGEL/Internal-Photos/Int-Photos-4086611) show the board with its shield off: an ESP32, a flash chip, two PCB antennas and a U.FL connector.
+
+![FCC internal photo of the RIGEL board with the shield removed, next to a ruler](/images/maytag-dryer-esphome/fcc-internal-photo.jpg)
+
+The filing also included a [datasheet](https://fccid.io/2AC7Z-RIGEL/User-Manual/User-Manual-4086617) with the full pinout, which was the best gift of the whole project. Two of those pads are labelled as the appliance bus (`GPIO27_WIN_TX` and `GPI37_WIN_RX`, pins 24 and 25), and four more are the standard ESP32 programming interface. I wrote the pinout up in [docs/hardware.md](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/docs/hardware.md).
+
+![RIGEL pin layout from the FCC datasheet, with the WIN bus on pins 24 and 25 and UART0 on pins 27 and 28](/images/maytag-dryer-esphome/fcc-pinout.png)
 
 ![The RIGEL board out of the console, with the Espressif module at the bottom](/images/maytag-dryer-esphome/rigel-module.jpg)
 
