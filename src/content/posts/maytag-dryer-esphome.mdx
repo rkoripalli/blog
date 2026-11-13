@@ -29,6 +29,18 @@ The answer came back quickly: no. Whirlpool's appliance cloud runs on AWS IoT Co
 
 With the dryer unplugged, a few screws on the back of the console let it tilt forward. The Wi-Fi lives on a small daughterboard: an Espressif-built ESP32 module Whirlpool calls **RIGEL**. The rating label even lists the module's FCC ID, 2AC7Z-RIGEL. Its FCC filing included a datasheet with the full pinout, which was the best gift of the whole project. Two of those pads are labelled as the appliance bus, and four more are the standard ESP32 programming interface. I wrote the pinout up in [docs/hardware.md](https://github.com/rkoripalli/maytag-dryer-esphome/blob/main/docs/hardware.md).
 
+Everything below comes from the public FCC filing for [2AC7Z-RIGEL](https://fccid.io/2AC7Z-RIGEL). The listing shows the module is Espressif's, certified in 2018:
+
+![The public FCC ID listing for 2AC7Z-RIGEL, registered to Espressif](/images/maytag-dryer-esphome/fcc-listing.png)
+
+The [internal photos](https://fccid.io/2AC7Z-RIGEL/Internal-Photos/Int-Photos-4086611) show the board with its shield off: the ESP32, the SPI flash chip, the crystal and the PCB antennas. That's the REV B board; mine is a later revision.
+
+![FCC internal photo of the RIGEL REV B module with its shield removed, next to a ruler](/images/maytag-dryer-esphome/fcc-internal-photo.jpg)
+
+The real prize was the [datasheet](https://fccid.io/2AC7Z-RIGEL/User-Manual/User-Manual-4086617), filed as the user manual. Pin 24 (`GPIO27_WIN_TX`) and pin 25 (`GPI37_WIN_RX`) are the appliance bus, and pins 26 to 28 are the boot pin and UART0 for flashing.
+
+![Pin layout from the RIGEL REV C datasheet: pins 24 and 25 are WIN TX and RX](/images/maytag-dryer-esphome/fcc-pinout.png)
+
 ![The RIGEL board out of the console, with the Espressif module at the bottom](/images/maytag-dryer-esphome/rigel-module.jpg)
 
 ![The back of the board](/images/maytag-dryer-esphome/rigel-board-back.jpg)
