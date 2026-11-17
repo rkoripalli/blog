@@ -2,7 +2,7 @@
 
 ## Approved Queue
 
-(empty — items here are ready for an agent to execute)
+(retired: approved work is a Paperclip issue in project **Blog**, not a line here)
 
 ## Proposed
 

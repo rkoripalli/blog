@@ -72,7 +72,7 @@ Buttondown dashboard, not in this repo).
 
 ## Backlog
 
-`blog-kb/TODO.md` (Approved Queue + Proposed). Post ideas: `blog-kb/post-ideas.md`.
+Work is tracked as Paperclip issues in project **Blog** (company "Home Trial", `http://127.0.0.1:3100`); the agent reports on its issue. [blog-kb/TODO.md](blog-kb/TODO.md) is a list of proposals for those issues, and [blog-kb/post-ideas.md](blog-kb/post-ideas.md) holds post ideas. User-only tasks go to Todoist via Staple Stan (Inbox › Blog section).
 
 ## Local model first
 
