@@ -40,5 +40,9 @@ hostnames, VLAN maps, keys, camera positions). Voice: first-person build log, li
     identifiable site — keep it anonymous and architectural).
 13. **Tracking macros without a subscription** — replacing a paid macro app with a self-built
     tracker calibrated against watch TDEE data.
-14. **How this blog works** — Hugo + PaperMod + GitHub Actions + the dark aurora theme; the
+14. **How this blog works** — Astro + the Blueprint theme + GitHub Actions (migrated from Hugo + PaperMod); the
     meta-post, links back to "A New Foundation".
+
+## Related notes
+<!-- kb-crosslinks 2026-11-13 -->
+- homelab-kb: [[inventory-containers]]

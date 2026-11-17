@@ -73,3 +73,14 @@ Buttondown dashboard, not in this repo).
 ## Backlog
 
 `blog-kb/TODO.md` (Approved Queue + Proposed). Post ideas: `blog-kb/post-ideas.md`.
+
+## Local model first
+
+- **Local model first:** use the `local-llm` MCP via the `local-offload` skill before reading or sorting bulk text yourself; Claude keeps judgment, design and shipped code.
+- **Design/UI loops:** send every screenshot to `describe_image` (vision) with a precise checklist (what must be visible, aligned, legible, unclipped). Look yourself only when it flags a problem, for the final review, or for a taste call.
+- **Large dumps** (HA states, Proxmox/UniFi listings, logs, changelogs): send them to `extract_json`, `triage` or `summarize` instead of reading them.
+
+## File layout
+
+- Site source: `src/` (pages, layouts, components, styles, lib) and `astro.config.mjs`. Published posts: `src/content/posts/` (public, no internal IPs or hostnames). Static assets and post images: `public/`. Ideas: `blog-kb/`.
+- `dist/` and `node_modules/` are generated; never edit them. Personal paperwork: none needed.
