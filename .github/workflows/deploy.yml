@@ -43,6 +43,10 @@ jobs:
           path: ./dist
 
   deploy:
+    # HOM-544: deploy only pushes made by Rohan or by Ada's merge bot. Agent
+    # GitHub Apps have no Workflows permission, so they cannot edit this line;
+    # a bot push to main lands but does not deploy until Ada reverts it.
+    if: github.actor == 'rkoripalli' || github.actor == 'rk-ada-lovelace-bytes[bot]'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
