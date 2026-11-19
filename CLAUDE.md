@@ -70,6 +70,27 @@ Components ship plain HTML plus a small script; keep them working without JS whe
 RSS-to-email automation watching `https://rkoripalli.github.io/blog/index.xml` (configured in the
 Buttondown dashboard, not in this repo).
 
+## UI screenshots
+
+`.github/workflows/ui-screenshots.yml` (HOM-752) renders the blog at the PR base and head with
+Playwright and uploads the PNGs for review. Informational only — not a required check, no secrets.
+It runs `scripts/ui_screenshots_ci.sh base|pr`, which builds the checkout, serves it with
+`astro preview` on 127.0.0.1:4321, and shoots the pages in `tests/fixtures/ui` via
+`scripts/ui_screenshots.py`. The script blocks every network host except localhost and the Google
+Fonts hosts (the theme's fonts come from there). If you change pages, layouts or styles, expect a
+PR to produce screenshots; if you add a new external resource, the allow-list in
+`ui_screenshots.py` must be updated deliberately.
+
+Run locally (preview in one shell, script in another):
+
+```
+npm ci && npm run build && ASTRO_TELEMETRY_DISABLED=1 npx astro preview --host 127.0.0.1 --port 4321
+pip install playwright && python -m playwright install chromium
+python scripts/ui_screenshots.py --base-url http://127.0.0.1:4321 --out shots/local --fixtures tests/fixtures/ui
+```
+
+UI PRs: attach the before/after PNGs to a Paperclip review issue for Pixel Pablo.
+
 ## Backlog
 
 Work is tracked as Paperclip issues in project **Blog** (company "Home Trial", `http://127.0.0.1:3100`); the agent reports on its issue. [blog-kb/TODO.md](blog-kb/TODO.md) is a list of proposals for those issues, and [blog-kb/post-ideas.md](blog-kb/post-ideas.md) holds post ideas. User-only tasks go to Todoist via Staple Stan (Inbox › Blog section).

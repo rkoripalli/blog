@@ -1,0 +1,4 @@
+.github/workflows/*.yml text eol=lf
+scripts/ui_screenshots.py text eol=lf
+scripts/ui_screenshots_ci.sh text eol=lf
+tests/fixtures/ui/*.json text eol=lf
