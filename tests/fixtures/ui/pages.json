@@ -1,0 +1,10 @@
+{
+  "note": "Paths only. The blog is a static public site, so the pages render the repo's own published posts; no private data is involved.",
+  "pages": [
+    {"name": "home", "path": "/blog/"},
+    {"name": "post", "path": "/blog/posts/new-foundation/"},
+    {"name": "post-mdx", "path": "/blog/posts/maytag-dryer-esphome/"},
+    {"name": "archive", "path": "/blog/posts/"},
+    {"name": "tag", "path": "/blog/tags/projects/"}
+  ]
+}
