@@ -19,7 +19,7 @@ import { url } from '../lib/site';
     const results = document.getElementById('results')!;
     type Item = { title: string; url: string; date: string; sheet: string; summary: string; tags: string[]; text: string };
     let index: Item[] | null = null;
-    const load = async () => (index ??= await (await fetch(input.dataset.index!)).json());
+    const load = async (): Promise<Item[]> => (index ??= await (await fetch(input.dataset.index!)).json());
     const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
     const run = async () => {
       const q = input.value.trim().toLowerCase();
