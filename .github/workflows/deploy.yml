@@ -52,7 +52,34 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+      issues: write
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      # HOM-1134: status codes only. Pages can lag the workflow by a minute or
+      # two, so retry for about 3 minutes. The blog has no ntfy topic, so a
+      # failure opens a deploy-smoke issue and fails the job.
+      - name: Post-deploy smoke
+        id: smoke
+        env:
+          SMOKE_RETRIES: "9"
+          SMOKE_RETRY_DELAY: "20"
+        run: |
+          bash scripts/deploy-smoke.sh check https://rkoripalli.github.io \
+            /blog/=200 /blog/posts/=200 /blog/posts/lumber-rack/=200 /blog/tags/=200 \
+            /blog/search/=200 /blog/search.json=200 /blog/index.xml=200 \
+            /blog/sitemap-index.xml=200 /blog/nope=404
+
+      - name: Report smoke failure
+        if: failure() && steps.smoke.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/deploy-smoke.sh issue
