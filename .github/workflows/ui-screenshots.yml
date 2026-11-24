@@ -1,0 +1,74 @@
+name: UI screenshots
+
+# HOM-752 (rollout of HOM-664). Renders the blog before (PR base) and after (PR
+# head) and uploads the PNGs for UI review. Informational only: not a required
+# check. GitHub-hosted runner, read-only token, no secrets.
+on:
+  pull_request:
+    paths:
+      - src/**
+      - public/**
+      - astro.config.mjs
+      - tsconfig.json
+      - package.json
+      - package-lock.json
+      - scripts/ui_screenshots.py
+      - scripts/ui_screenshots_ci.sh
+      - tests/fixtures/ui/**
+      - .github/workflows/ui-screenshots.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ui-screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      ASTRO_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: Check out PR head
+        uses: actions/checkout@v4
+        with:
+          path: pr
+          persist-credentials: false
+      - name: Check out PR base
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: pr/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Playwright
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+
+      # Screenshot script and fixtures always come from the PR side, so base and
+      # head render the same pages. Base may fail (first PR, older base); only
+      # that step is continue-on-error.
+      - name: Screenshot base
+        continue-on-error: true
+        run: bash pr/scripts/ui_screenshots_ci.sh base
+      - name: Screenshot PR
+        run: bash pr/scripts/ui_screenshots_ci.sh pr
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-screenshots
+          path: shots/
+          retention-days: 14
+          if-no-files-found: warn
