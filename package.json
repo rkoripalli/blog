@@ -18,5 +18,9 @@
   },
   "engines": {
     "node": ">=22"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "typescript": "^6.0.3"
   }
 }
