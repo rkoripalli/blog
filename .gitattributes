@@ -2,3 +2,8 @@
 scripts/ui_screenshots.py text eol=lf
 scripts/ui_screenshots_ci.sh text eol=lf
 tests/fixtures/ui/*.json text eol=lf
+
+# HOM-1136: vendored third-party file must stay byte-identical (sha256-pinned)
+scripts/vendor/impeccable-detect.js -text
+scripts/ui_gate.py text eol=lf
+scripts/ui_detect.py text eol=lf
