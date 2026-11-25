@@ -14,6 +14,9 @@ on:
       - package-lock.json
       - scripts/ui_screenshots.py
       - scripts/ui_screenshots_ci.sh
+      - scripts/ui_detect.py
+      - scripts/ui_gate.py
+      - scripts/vendor/**
       - tests/fixtures/ui/**
       - .github/workflows/ui-screenshots.yml
 
@@ -28,6 +31,8 @@ jobs:
   screenshots:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    outputs:
+      regressed: ${{ steps.gate.outputs.regressed }}
     env:
       ASTRO_TELEMETRY_DISABLED: "1"
     steps:
@@ -64,6 +69,16 @@ jobs:
       - name: Screenshot PR
         run: bash pr/scripts/ui_screenshots_ci.sh pr
 
+      # UI gate (HOM-1136): Impeccable score + pixel diff, base vs PR. Informational: the script
+      # always exits 0 and the step can never fail the job. It only reports `regressed` for the
+      # label job below. Read-only token, no secrets.
+      - name: UI gate (score + pixel diff)
+        id: gate
+        continue-on-error: true
+        run: |
+          pip install pillow==13.0.0
+          python pr/scripts/ui_gate.py --base shots/base --pr shots/pr --threshold 5
+
       - name: Upload screenshots
         if: always()
         uses: actions/upload-artifact@v4
@@ -72,3 +87,22 @@ jobs:
           path: shots/
           retention-days: 14
           if-no-files-found: warn
+
+  # Label job (HOM-1136): the only place with a write token. No checkout, no artifact download
+  # and no PR-supplied strings: it reads one boolean job output and the numeric PR number, so
+  # PR code never runs with this permission.
+  label:
+    name: Label ui-review on regression
+    needs: screenshots
+    if: needs.screenshots.outputs.regressed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Add ui-review label
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: gh pr edit "$PR_NUMBER" --repo "$REPO" --add-label ui-review

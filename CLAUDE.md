@@ -89,6 +89,8 @@ pip install playwright && python -m playwright install chromium
 python scripts/ui_screenshots.py --base-url http://127.0.0.1:4321 --out shots/local --fixtures tests/fixtures/ui
 ```
 
+UI gate (HOM-1136): `scripts/ui_screenshots.py` injects the vendored Impeccable detector (`scripts/vendor/impeccable-detect.js`, Apache-2.0, sha256-pinned, see `scripts/vendor/README.md`) via `scripts/ui_detect.py` and writes `<shot>.findings.json` beside each PNG. `scripts/ui_gate.py` scores base vs PR per shot (warnings x1 + errors x3, advisory excluded, `.impeccable/config.json` `detector.ignoreRules` honoured), pixel-diffs the PNGs and writes a table to the job summary. The `label` job adds `ui-review` only when a page scores worse, a new page has findings, or more than 5% of a page's pixels change. It never fails the PR. The label job is the only write token (`pull-requests: write`, no checkout, one boolean output). The `ui-review` label must exist in the repo. No base shots = no baseline = no label.
+
 UI PRs: attach the before/after PNGs to a Paperclip review issue for Pixel Pablo.
 
 ## Backlog

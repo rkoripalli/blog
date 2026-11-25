@@ -20,6 +20,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from playwright.sync_api import sync_playwright
+from ui_detect import DETECTOR_CONFIG, load_detector, scan_page
 
 # The theme loads Barlow Condensed / IBM Plex from Google Fonts, so those two
 # hosts are on the allow-list on purpose (HOM-752 review); everything else is blocked.
@@ -37,10 +38,11 @@ def route(r):
     return r.continue_() if host in ALLOWED_HOSTS else r.abort()
 
 
-def shoot(browser, base_url, out, page_def, viewport) -> bool:
+def shoot(browser, base_url, out, page_def, viewport, detector_js) -> bool:
     name = f"{page_def['name']}-{viewport}.png"
     ctx = browser.new_context(locale="en-US", timezone_id="America/Chicago",
                               **VIEWPORTS[viewport])
+    ctx.add_init_script(DETECTOR_CONFIG)
     try:
         page = ctx.new_page()
         page.route("**/*", route)
@@ -50,7 +52,9 @@ def shoot(browser, base_url, out, page_def, viewport) -> bool:
             return False
         page.evaluate("document.fonts.ready")
         page.wait_for_load_state("networkidle")
+        page.add_script_tag(content=detector_js)
         page.screenshot(path=str(out / name), full_page=True, animations="disabled")
+        scan_page(page, out / name)
         print(f"wrote {out / name}")
         return True
     finally:
@@ -66,12 +70,13 @@ def main() -> int:
     a.out.mkdir(parents=True, exist_ok=True)
     pages = json.loads((a.fixtures / "pages.json").read_text(encoding="utf-8"))["pages"]
     written = 0
+    detector_js = load_detector()
     with sync_playwright() as p:
         browser = p.chromium.launch()
         try:
             for page_def in pages:
                 for viewport in VIEWPORTS:
-                    written += shoot(browser, a.base_url, a.out, page_def, viewport)
+                    written += shoot(browser, a.base_url, a.out, page_def, viewport, detector_js)
         finally:
             browser.close()
     return 0 if written else 1
